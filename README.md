@@ -15,6 +15,8 @@ A minimal implementation of the “Routing Slip” pattern. You have a list of t
 ## Example
 
 ```csharp
+var context = new Dictionary<string, object>();
+
 var routingSlip = new RoutingSlip();
 routingSlip.AddTask(new TestTask("Task1"));
 routingSlip.AddTask(new TestTask("Task2"));
@@ -22,8 +24,7 @@ routingSlip.AddTask(new TestTask("Task2"));
 // Execute
 try
 {
-    await routingSlip.ExecuteAsync();
-    // All tasks succeeded
+    await routingSlip.ExecuteAsync(context, cts.Token);
 }
 catch (InvalidOperationException ex)
 {
