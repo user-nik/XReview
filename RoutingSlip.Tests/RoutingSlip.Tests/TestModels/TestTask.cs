@@ -20,10 +20,10 @@ internal class TestTask : IRoutingSlipTask
         _throwErrorOnExecute = throwErrorOnExecute;
     }
 
-    public async Task ExecuteAsync()
+    public async Task ExecuteAsync(IDictionary<string, object> context, CancellationToken token)
     {
         Executed = true;
-        await Task.Delay(10);
+        await Task.Delay(10, token);
 
         if (_throwErrorOnExecute)
         {
@@ -31,10 +31,10 @@ internal class TestTask : IRoutingSlipTask
         }
     }
 
-    public async Task RollbackAsync()
+    public async Task RollbackAsync(IDictionary<string, object> context, CancellationToken token)
     {
         RolledBack = true;
-        await Task.Delay(10);
+        await Task.Delay(10, token);
 
         if (ThrowErrorOnRollback)
         {

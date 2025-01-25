@@ -20,15 +20,19 @@ public class RoutingSlip
     /// Execute tasks in sequence.
     /// Roll back completed tasks in case of an error.
     /// </summary>
-    public async Task ExecuteAsync()
+    public async Task ExecuteAsync(IDictionary<string, object>? context, CancellationToken token)
     {
+        context ??= new Dictionary<string, object>();
+        
         var executedTasks = new Stack<IRoutingSlipTask>();
 
         try
         {
             foreach (var task in _tasks)
             {
-                await task.ExecuteAsync();
+                token.ThrowIfCancellationRequested();
+
+                await task.ExecuteAsync(context, token);
                 executedTasks.Push(task);
             }
         }
@@ -39,7 +43,7 @@ public class RoutingSlip
                 var lastTask = executedTasks.Pop();
                 try
                 {
-                    await lastTask.RollbackAsync();
+                    await lastTask.RollbackAsync(context, token);
                 }
                 catch (Exception rollbackEx)
                 {

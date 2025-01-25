@@ -24,7 +24,7 @@ namespace RoutingSlip.Tests
             routingSlip.AddTask(task3);
 
             // Act
-            await routingSlip.ExecuteAsync();
+            await routingSlip.ExecuteAsync(new Dictionary<string, object>(), CancellationToken.None);
 
             // Assert
             Assert.IsTrue(task1.Executed);
@@ -57,7 +57,7 @@ namespace RoutingSlip.Tests
             // Act & Assert
             var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await routingSlip.ExecuteAsync();
+                await routingSlip.ExecuteAsync(new Dictionary<string, object>(), CancellationToken.None);
             });
 
             Assert.That(ex, Is.Not.Null);
@@ -98,7 +98,7 @@ namespace RoutingSlip.Tests
             // Act
             var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await routingSlip.ExecuteAsync();
+                await routingSlip.ExecuteAsync(new Dictionary<string, object>(), CancellationToken.None);
             });
             Assert.That(ex, Is.Not.Null);
 
@@ -111,6 +111,29 @@ namespace RoutingSlip.Tests
 
             Assert.IsTrue(failingTask.Executed);
             Assert.IsFalse(failingTask.RolledBack);
+        }
+        
+        [Test]
+        public async Task Execute_UseContext_DataIsTransferredBetweenTasks()
+        {
+            // Arrange
+            var routingSlip = new RoutingSlip();
+            var context = new Dictionary<string, object>();
+
+            var writeTask = new ContextWriteTask("WriteTask", "key", "value");
+            var readTask = new ContextReadTask("ReadTask", "key"); 
+
+            routingSlip.AddTask(writeTask);
+            routingSlip.AddTask(readTask);
+
+            // Act
+            await routingSlip.ExecuteAsync(context, CancellationToken.None);
+
+            // Assert
+            Assert.IsTrue(writeTask.Executed);
+            Assert.That(context["key"], Is.EqualTo("value"));
+
+            Assert.IsTrue(readTask.Executed);
         }
     }
 }

@@ -9,10 +9,10 @@ public interface IRoutingSlipTask
     /// <summary>
     /// Main task logic.
     /// </summary>
-    Task ExecuteAsync();
+    Task ExecuteAsync(IDictionary<string, object> context, CancellationToken token);
 
     /// <summary>
     /// Actions to cancel or compensate if something goes wrong.
     /// </summary>
-    Task RollbackAsync();
+    Task RollbackAsync(IDictionary<string, object> context, CancellationToken token);
 }
